@@ -1,0 +1,6 @@
+
+# Add CFLAGS="-fPIC" to Makefile. Required by file package
+
+make
+ 
+make PREFIX=/tools install

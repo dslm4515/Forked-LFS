@@ -1,0 +1,8 @@
+# The main script for building modules is written in Python, and uses hard-coded paths to the host /usr/include and /usr/lib directories. To prevent them from being used, issue:
+sed -i '/def add_multiarch_paths/a \        return' setup.py
+
+./configure --prefix=/tools --without-ensurepip
+
+make
+
+make install

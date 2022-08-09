@@ -1,0 +1,9 @@
+# No need to install any of the shared Gettext libraries at this 
+# time, therefore there is no need to build them
+./configure --disable-shared
+
+# Compile
+make
+
+# Install the msgfmt, msgmerge and xgettext programs:
+cp -v gettext-tools/src/{msgfmt,msgmerge,xgettext} /tools/bin

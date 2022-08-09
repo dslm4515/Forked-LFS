@@ -1,0 +1,22 @@
+# Optional: Built for testing packages
+
+# Configure source
+cd unix
+./configure --prefix=/tools
+
+# Compile
+make
+
+# Install to /tools
+make install
+
+# Make the installed library writable so 
+# debugging symbols can be removed later:
+chmod -v u+w /tools/lib/libtcl8.6.so
+
+# Install Tcl's headers. The next package, 
+# Expect, requires them to build.
+make install-private-headers
+
+# Make a necessary symbolic link:
+ln -sv tclsh8.6 /tools/bin/tclsh

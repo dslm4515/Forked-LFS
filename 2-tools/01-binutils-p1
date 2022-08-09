@@ -1,0 +1,25 @@
+# Tools: Binutils Pass 1
+# Build as lfs user
+
+# The Binutils documentation recommends building Binutils in a dedicated build directory:
+mkdir -v build
+cd       build
+
+# Configure source
+../configure --prefix=/tools            \
+             --with-sysroot=$LFS        \
+             --with-lib-path=/tools/lib \
+             --target=$LFS_TGT          \
+             --disable-nls              \
+             --disable-werror
+
+# Compile
+make
+
+# If building on x86_64, create a symlink to ensure the sanity of the toolchain:
+case $(uname -m) in
+  x86_64) mkdir -v /tools/lib && ln -sv lib /tools/lib64 ;;
+esac
+
+# Install
+make install

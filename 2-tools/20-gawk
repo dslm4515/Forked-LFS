@@ -1,0 +1,8 @@
+# Ensure some unneeded files are not installed:
+sed -i 's/extras//' Makefile.in
+
+./configure --prefix=/tools
+
+make
+
+make install

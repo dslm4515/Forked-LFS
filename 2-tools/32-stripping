@@ -1,0 +1,26 @@
+# The steps in this section are optional, but if the LFS 
+# partition is rather small, it is beneficial to learn that 
+# unnecessary items can be removed. The executables and 
+# libraries built so far contain about 70 MB of unneeded 
+# debugging symbols. Remove those symbols with:
+strip --strip-unneeded /tools/bin/*
+strip --strip-unneeded /tools/sbin/*
+strip --strip-unneeded /tools/libexec/*
+strip --strip-unneeded /tools/libexec/awk/*
+strip --strip-unneeded /tools/libexec/coreutils/* 
+strip --strip-unneeded /tools/libexec/getconf/* 
+strip --strip-unneeded /tools/libexec/gcc/x86_64-lfs-linux-gnu/12.1.0/*
+strip --strip-unneeded /tools/libexec/gcc/x86_64-lfs-linux-gnu/12.1.0/install-tools/*
+strip --strip-unneeded /tools/libexec/gcc/x86_64-lfs-linux-gnu/12.1.0/plugin/* 
+strip --strip-unneeded /tools/libexec/gcc/x86_64-pc-linux-gnu/12.1.0/*
+strip --strip-unneeded /tools/libexec/gcc/x86_64-pc-linux-gnu/12.1.0/install-tools/*
+strip --strip-unneeded /tools/libexec/gcc/x86_64-pc-linux-gnu/12.1.0/plugin/*
+strip --strip-unneeded /tools/x86_64-lfs-linux-gnu/bin/*
+strip --strip-unneeded /tools/x86_64-pc-linux-gnu/bin/*
+strip --strip-unneeded /tools/lib/lib*.so*
+
+# To save more, remove the documentation:
+rm -rf /tools/{,share}/{info,man,doc}
+
+# Remove unneeded files:
+find /tools/{lib,libexec} -name \*.la -delete

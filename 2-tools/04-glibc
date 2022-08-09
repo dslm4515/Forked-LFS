@@ -1,0 +1,25 @@
+mkdir -v build
+cd       build
+
+../configure                             \
+      --prefix=/tools                    \
+      --host=$LFS_TGT                    \
+      --build=$(../scripts/config.guess) \
+      --enable-kernel=3.2                \
+      --with-headers=/tools/include
+
+make 
+
+make install
+
+# At this point, it is imperative to stop and ensure that the basic functions (compiling and linking) of the new toolchain are working as expected. To perform a sanity check, run the following commands:
+
+echo 'int main(){}' > dummy.c
+$LFS_TGT-gcc dummy.c
+readelf -l a.out | grep ': /tools'
+
+# If everything is working correctly, there should be no errors, and the output of the last command will be of the form:
+# [Requesting program interpreter: /tools/lib64/ld-linux-x86-64.so.2]
+
+# Once all is well, clean up the test files:
+rm -v dummy.c a.out

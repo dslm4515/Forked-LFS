@@ -1,0 +1,18 @@
+# Force Expect's configure script to use /bin/stty instead of 
+# a /usr/local/bin/stty it may find on the host system. This 
+# will ensure that our test suite tools remain sane for the 
+# final builds of our toolchain:
+cp -v configure{,.orig}
+sed 's:/usr/local/bin:/bin:' configure.orig > configure
+
+# Configure source
+./configure --prefix=/tools       \
+            --with-tcl=/tools/lib \
+            --with-tclinclude=/tools/include
+
+# Compile
+make 
+
+# Install without the supplementary Expect scripts, which are not needed
+make SCRIPTS="" install
+

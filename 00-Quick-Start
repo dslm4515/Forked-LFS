@@ -1,0 +1,88 @@
+# Quick Start
+# This is handy for experienced users that have done LFS builds already.
+
+# If building on a seperate partition, create the file system and mount it.
+# Set $LFS to the mount point. Example:
+# Perform as root:
+mkfs.etx4 /dev/sdXY
+mkdir -pv /mnt/lfs
+mount /dev/sdXY /mnt/lfs
+export LFS=/mnt/lfs
+
+# Downloaded packages and patches will need to be stored somewhere that is 
+# conveniently available throughout the entire build. A working directory 
+# is also required to unpack the sources and build them. $LFS/sources can 
+# be used both as the place to store the tarballs and patches and as a 
+# working directory. By using this directory, the required elements will 
+# be located on the LFS partition and will be available during all stages 
+# of the building process.
+
+# To create this directory, execute the following command, as user root, 
+# before starting the download session:
+mkdir -pv $LFS/sources
+
+# Keep the directory neat:
+mkdir -pv $LFS/sources/{pkgs,patches,files}
+
+# Make this directory writable and sticky:
+chmod -v a+wt $LFS/sources
+
+# Download the packages via a list (provided in this repo) with wget:
+wget --input-file=wget-list --continue --directory-prefix=$LFS/sources/pkgs
+
+# Copy the patches from this repo:
+cp -r patches/* $LFS/sources/patches/
+
+# There is a separate file, md5sums, which can be used to verify that 
+# all the correct packages are available before proceeding. Place that 
+# file in $LFS/sources and run:
+pushd $LFS/sources/pkgs
+md5sum -c md5sums
+popd
+
+# Copy the patches from this repo:
+cp -r patches/* $LFS/sources/patches/
+
+# Create the required directory by running the following as root:
+mkdir -v $LFS/tools
+
+# Create a /tools symlink on the host system. This will point to the 
+# newly-created directory on the LFS partition. Run this command as root 
+# as well:
+ln -sv $LFS/tools /
+
+# As root, issue the following commands to add the new LFS user:
+groupadd lfs
+useradd -s /bin/bash -g lfs -m -k /dev/null lfs
+
+# Set password for user
+passwd lfs
+
+# Grant lfs full access to $LFS/tools by making lfs the directory owner:
+chown -v lfs $LFS/tools
+
+# If a separate working directory was created as suggested, give user 
+# lfs ownership of this directory:
+chown -v lfs $LFS/sources
+
+# Next, login as user lfs. This can be done via a virtual console, 
+# through a display manager, or with the following substitute user command:
+su - lfs
+
+# Set up the environment:
+cat > ~/.bash_profile << "EOF"
+exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash
+EOF
+
+cat > ~/.bashrc << "EOF"
+set +h
+umask 022
+LFS=/mnt/lfs
+LC_ALL=POSIX
+LFS_TGT=$(uname -m)-lfs-linux-gnu
+PATH=/tools/bin:/bin:/usr/bin
+export LFS LC_ALL LFS_TGT PATH
+EOF
+
+# Source the just-created user profile
+source ~/.bash_profile

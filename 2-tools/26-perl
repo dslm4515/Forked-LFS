@@ -1,0 +1,9 @@
+sh Configure -des -Dprefix=/tools -Dlibs=-lm -Uloclibpth -Ulocincpth
+
+make 
+
+# Only a few of the utilities and libraries need to be installed at 
+# this time
+cp -v perl cpan/podlators/scripts/pod2man /tools/bin
+mkdir -pv /tools/lib/perl5/5.36.0
+cp -Rv lib/* /tools/lib/perl5/5.36.0
