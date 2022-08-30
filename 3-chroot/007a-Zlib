@@ -1,0 +1,13 @@
+# Alternatively, install the traditional zlib instead of zlin-ng
+
+# Configure source
+./configure  --prefix=/usr \
+
+# Compile
+make
+
+# Install
+make install
+
+# Remove a useless static library: 
+rm -fv /usr/lib/libz.a

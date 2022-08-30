@@ -1,0 +1,143 @@
+# Some of the Glibc programs use the non-FHS compliant /var/db directory to store their runtime data. Apply the following patch to make such programs store their runtime data in the FHS-compliant locations
+patch -Np1 -i ../patches/glibc-2.35-fhs-1.patch 
+
+# The Glibc documentation recommends building Glibc in a dedicated build directory:
+mkdir -v build
+cd       build
+
+# Ensure that the ldconfig and sln utilities will be installed into /usr/sbin:
+echo "rootsbindir=/usr/sbin" > configparms
+
+# Configure the source:
+../configure --prefix=/usr                            \
+             --disable-werror                         \
+             --enable-kernel=3.2                      \
+             --enable-stack-protector=strong          \
+             --with-headers=/usr/include              \
+             libc_cv_slibdir=/usr/lib
+
+# Compile
+make
+
+# Test build as test suite for Glibc is considered critical. Do not skip it under any circumstance, per LFS book.
+make check
+
+# This is a list of the most common issues seen for recent versions of LFS:
+# o io/tst-lchmod is known to fail in the LFS chroot environment.
+# o misc/tst-ttyname is known to fail in the LFS chroot environment.
+# o The nss/tst-nss-files-hosts-long test is known to fail if the system has no non-loopback IP addresses.
+# o Some tests, for example nss/tst-nss-files-hosts-multi, are known to fail on relatively slow systems due to an internal timeout.
+# o About 27 tests, for example elf/tst-pldd, are known to fail if the kernel supports namespaces (see namespaces(7) for details) but the host distro has disabled them via sysctl.
+
+# Though it is a harmless message, the install stage of Glibc will complain about the absence of /etc/ld.so.conf. Prevent this warning with:
+touch /etc/ld.so.conf
+
+# Fix the Makefile to skip an unneeded sanity check that fails in the LFS partial environment:
+sed '/test-installation/s@$(PERL)@echo not running@' -i ../Makefile
+
+# Install
+make install
+
+# Fix hardcoded path to the executable loader in ldd script:
+sed '/RTLDLIST=/s@/usr@@g' -i /usr/bin/ldd
+
+# Install the configuration file and runtime directory for nscd:
+cp -v ../nscd/nscd.conf /etc/nscd.conf
+mkdir -pv /var/cache/nscd
+
+# Individual locales can be installed using the localedef program. E.g., the second localedef command below combines the /usr/share/i18n/locales/cs_CZ charset-independent locale definition with the /usr/share/i18n/charmaps/UTF-8.gz charmap definition and appends the result to the /usr/lib/locale/locale-archive file. The following instructions will install the minimum set of locales necessary for the optimal coverage of tests
+mkdir -pv /usr/lib/locale
+localedef -i POSIX -f UTF-8 C.UTF-8 2> /dev/null || true
+localedef -i cs_CZ -f UTF-8 cs_CZ.UTF-8
+localedef -i de_DE -f ISO-8859-1 de_DE
+localedef -i de_DE@euro -f ISO-8859-15 de_DE@euro
+localedef -i de_DE -f UTF-8 de_DE.UTF-8
+localedef -i el_GR -f ISO-8859-7 el_GR
+localedef -i en_GB -f ISO-8859-1 en_GB
+localedef -i en_GB -f UTF-8 en_GB.UTF-8
+localedef -i en_HK -f ISO-8859-1 en_HK
+localedef -i en_PH -f ISO-8859-1 en_PH
+localedef -i en_US -f ISO-8859-1 en_US
+localedef -i en_US -f UTF-8 en_US.UTF-8
+localedef -i es_ES -f ISO-8859-15 es_ES@euro
+localedef -i es_MX -f ISO-8859-1 es_MX
+localedef -i fa_IR -f UTF-8 fa_IR
+localedef -i fr_FR -f ISO-8859-1 fr_FR
+localedef -i fr_FR@euro -f ISO-8859-15 fr_FR@euro
+localedef -i fr_FR -f UTF-8 fr_FR.UTF-8
+localedef -i is_IS -f ISO-8859-1 is_IS
+localedef -i is_IS -f UTF-8 is_IS.UTF-8
+localedef -i it_IT -f ISO-8859-1 it_IT
+localedef -i it_IT -f ISO-8859-15 it_IT@euro
+localedef -i it_IT -f UTF-8 it_IT.UTF-8
+localedef -i ja_JP -f EUC-JP ja_JP
+localedef -i ja_JP -f SHIFT_JIS ja_JP.SJIS 2> /dev/null || true
+localedef -i ja_JP -f UTF-8 ja_JP.UTF-8
+localedef -i nl_NL@euro -f ISO-8859-15 nl_NL@euro
+localedef -i ru_RU -f KOI8-R ru_RU.KOI8-R
+localedef -i ru_RU -f UTF-8 ru_RU.UTF-8
+localedef -i se_NO -f UTF-8 se_NO.UTF-8
+localedef -i ta_IN -f UTF-8 ta_IN.UTF-8
+localedef -i tr_TR -f UTF-8 tr_TR.UTF-8
+localedef -i zh_CN -f GB18030 zh_CN.GB18030
+localedef -i zh_HK -f BIG5-HKSCS zh_HK.BIG5-HKSCS
+localedef -i zh_TW -f UTF-8 zh_TW.UTF-8
+
+# Adding nsswitch.conf
+cat > /etc/nsswitch.conf << "EOF"
+# Begin /etc/nsswitch.conf
+
+passwd: files
+group: files
+shadow: files
+
+hosts: files dns
+networks: files
+
+protocols: files
+services: files
+ethers: files
+rpc: files
+
+# End /etc/nsswitch.conf
+EOF
+
+# Add timezone data:
+tar -xf ../../pkgs/tzdata2022a.tar.gz 
+
+ZONEINFO=/usr/share/zoneinfo
+mkdir -pv $ZONEINFO/{posix,right}
+
+for tz in etcetera southamerica northamerica europe africa antarctica  \
+          asia australasia backward; do
+    zic -L /dev/null   -d $ZONEINFO       ${tz}
+    zic -L /dev/null   -d $ZONEINFO/posix ${tz}
+    zic -L leapseconds -d $ZONEINFO/right ${tz}
+done
+
+cp -v zone.tab zone1970.tab iso3166.tab $ZONEINFO
+zic -d $ZONEINFO -p America/New_York
+unset ZONEINFO
+
+# One way to determine the local time zone is to run the following script:
+tzselect
+
+# Then create the /etc/localtime file by running:
+ln -sfv /usr/share/zoneinfo/<xxx> /etc/localtime
+# Replace <xxx> with the name of the time zone selected (e.g., Canada/Eastern).
+
+# Create a new file /etc/ld.so.conf by running the following:
+cat > /etc/ld.so.conf << "EOF"
+# Begin /etc/ld.so.conf
+/usr/local/lib
+/opt/lib
+
+EOF
+
+# If desired, the dynamic loader can also search a directory and include the contents of files found there. Generally the files in this include directory are one line specifying the desired library path. To add this capability run the following commands:
+cat >> /etc/ld.so.conf << "EOF"
+# Add an include directory
+include /etc/ld.so.conf.d/*.conf
+
+EOF
+mkdir -pv /etc/ld.so.conf.d

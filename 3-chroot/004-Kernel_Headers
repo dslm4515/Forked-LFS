@@ -1,0 +1,20 @@
+# Kernel Headers
+
+# Make sure there are no stale files and dependencies 
+# lying around from previous activity:
+make mrproper
+
+# Extract the user-visible kernel headers from the source:
+make headers
+
+# Install headers
+cp -rv usr/include/* /usr/include
+
+# After installed, there still are also some hidden
+# files used by the kernel developers (for what?)
+# and not needed by MLFS that now can be removed
+# from our /usr/include.
+find /usr/include -name '.*' -exec rm -vf {} \;
+
+# The Makefile present also won't be used
+rm -v /usr/include/Makefile

@@ -1,0 +1,14 @@
+# Configure source:
+./configure --prefix=/usr    \
+            --disable-static \
+            --with-curses    \
+            --docdir=/usr/share/doc/readline-8.1.2
+
+# Compile
+make SHLIB_LIBS="-lncursesw"
+
+# Install
+make SHLIB_LIBS="-lncursesw" install
+
+# If desired, install the documentation:
+install -v -m644 doc/*.{ps,pdf,html,dvi} /usr/share/doc/readline-8.1.2

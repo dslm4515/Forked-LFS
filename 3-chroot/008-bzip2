@@ -1,0 +1,32 @@
+# Apply patches from Clear Linux
+# Modifies build to configure with a script
+patch -Np1 -i ../patches/bzip2-clear/0001-Autotoolize-bzip2.patch
+patch -Np1 -i ../patches/bzip2-clear/0002-Improve-file-access.patch
+
+# Create configure script...tool chain needs autotools!
+# Use patch instead of using autoreconf of auto-tools.
+# autoreconfig -vfi
+patch -Np1 -i ../patches/bzip2-mlfs/bzip2-reconfigured.patch
+chmod -v +x configure
+
+# File & Freeytpe requires this flag set for bzip2
+export CFLAGS="-fPIC"
+
+# Prepare the source
+./configure --prefix=/usr \
+            --disable-static
+
+# Build & Install
+make && make install
+
+# Library has wrong version in file name. Fix it
+mv -v /usr/lib/libbz2.so.1.0.0 /usr/lib/libbz2.so.1.0.8
+rm -v /usr/lib/{libbz2.so,libbz2.so.1}
+ln -sv libbz2.so.1.0.8 /usr/lib/libbz2.so
+ln -sv libbz2.so.1.0.8 /usr/lib/libbz2.so.1
+
+# Create missing links
+ln -sv bzip2 /usr/bin/bunzip2
+ln -sv bzip2 /usr/bin/bzcat
+
+unset CFLAGS

@@ -1,0 +1,11 @@
+# Apply a patch to fix some issues identified by upstream:
+patch -Np1 -i ../patches/zstd-1.5.2-upstream_fixes-1.patch 
+
+# Compile
+make prefix=/usr
+
+# Install
+make prefix=/usr install
+
+# Remove the static library:
+rm -v /usr/lib/libzstd.a

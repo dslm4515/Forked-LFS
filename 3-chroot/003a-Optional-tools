@@ -1,0 +1,11 @@
+# Optional Tools
+# Building vim for the toolchain in /tools is helpful when
+# editing files in the chroot environment
+
+# Vim - File editor
+
+./configure --prefix=/tools --disable-gui --without-x
+
+make 
+
+make install

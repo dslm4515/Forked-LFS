@@ -1,0 +1,15 @@
+# Configure source
+./configure  --prefix=/usr \
+             --libdir=/usr/lib \
+             --zlib-compat \
+             --sharedlibdir=/usr/lib
+
+# Compile
+make
+
+# Install
+make install
+
+# Add missing combatibility link
+ln -sv libz.so.1.2.11.zlib-ng /usr/lib/libz.so.1.2.11
+

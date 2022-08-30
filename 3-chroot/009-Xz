@@ -1,0 +1,10 @@
+# Apply a patch to fix an issue in xzgrep:
+patch -Np1 -i ../patches/xz-5.2.5-upstream_fix-1.patch
+
+# Configure source:
+./configure --prefix=/usr    \
+            --disable-static \
+            --docdir=/usr/share/doc/xz-5.2.5
+
+# Build & install
+make && make install
