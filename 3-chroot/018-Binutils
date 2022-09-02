@@ -1,0 +1,34 @@
+# Verify that the PTYs are working properly inside the chroot 
+# environment by performing a simple test: 
+expect -c "spawn ls"
+
+# This command should output the following: 
+# spawn ls
+
+# The Binutils documentation recommends building Binutils in a 
+# dedicated build directory: 
+mkdir -v build
+cd       build
+
+# Prepare Binutils for compilation: 
+../configure --prefix=/usr       \
+             --sysconfdir=/etc   \
+             --enable-gold       \
+             --enable-ld=default \
+             --enable-plugins    \
+             --enable-shared     \
+             --disable-werror    \
+             --enable-64-bit-bfd \
+             --with-system-zlib
+
+# Compile the package:
+make tooldir=/usr
+
+# Test the results: 
+make -k check
+
+# Install:
+make tooldir=/usr install
+
+# Remove useless static libraries: 
+rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes}.a
