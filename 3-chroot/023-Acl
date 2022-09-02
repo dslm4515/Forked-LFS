@@ -1,0 +1,11 @@
+# Configure source:
+./configure --prefix=/usr     \
+            --disable-static  \
+            --sysconfdir=/etc \
+            --docdir=/usr/share/doc/acl-2.3.1
+
+# Compile
+make
+
+# Install it
+make install

@@ -1,0 +1,16 @@
+# Configure source:
+./configure --prefix=/usr        \
+            --disable-static     \
+            --enable-thread-safe \
+            --docdir=/usr/share/doc/mpfr-4.1.0
+
+# Compile the package and generate the HTML documentation:
+make
+make html
+
+# Test the results and ensure that all tests passed:
+make check
+
+# If no failed tests, install it:
+make install
+make install-html

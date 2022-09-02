@@ -1,0 +1,34 @@
+# If you are building for 32-bit x86, but you have a CPU 
+# which is capable of running 64-bit code and you have 
+# specified CFLAGS in the environment, the configure 
+# script will attempt to configure for 64-bits and fail. 
+# Avoid this by invoking the configure command below with
+ABI=32 ./configure ...
+
+# The default settings of GMP produce libraries optimized 
+# for the host processor. If libraries suitable for 
+# processors less capable than the host's CPU are desired, 
+# generic libraries can be created by running the following:
+cp -v configfsf.guess config.guess
+cp -v configfsf.sub   config.sub
+
+# Configure the source:
+./configure --prefix=/usr    \
+            --enable-cxx     \
+            --disable-static \
+            --docdir=/usr/share/doc/gmp-6.2.1
+
+# Compile
+make 
+make html
+
+# Test the results.
+make check 2>&1 | tee gmp-check-log
+
+# Ensure that all 197 tests in the test suite passed. 
+# Check the results by issuing the following command:
+awk '/# PASS:/{total+=$3} ; END{print total}' gmp-check-log
+
+# Install it:
+make install
+make install-html
