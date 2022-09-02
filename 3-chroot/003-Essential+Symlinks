@@ -16,6 +16,13 @@ ln -sv bash /bin/sh
 # create the following symbolic link:
 ln -sv /proc/self/mounts /etc/mtab
 
+# Create a basic /etc/hosts file to be referenced in some 
+# test suites, and in one of Perl's configuration files as well:
+cat > /etc/hosts << EOF
+127.0.0.1  localhost $(hostname)
+::1        localhost
+EOF
+
 # Create the /etc/passwd file by running the following command:
 cat > /etc/passwd << "EOF"
 root:x:0:0:root:/root:/bin/bash
@@ -50,6 +57,12 @@ wheel:x:97:
 nogroup:x:99:
 users:x:999:
 EOF
+
+# Some tests need a regular user. Add this user here and 
+# delete this account at the end of the stage(chroot).
+echo "tester:x:101:101::/home/tester:/bin/bash" >> /etc/passwd
+echo "tester:x:101:" >> /etc/group
+install -o tester -d /home/tester
 
 # To remove the “I have no name!” prompt, start a new shell. Since a 
 # full Glibc was installed in Chapter 5 and the /etc/passwd and 
