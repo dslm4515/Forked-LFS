@@ -1,0 +1,8 @@
+# Configure source
+./configure --prefix=/usr
+
+# Compile & build docs
+make
+
+# Install it  
+make install

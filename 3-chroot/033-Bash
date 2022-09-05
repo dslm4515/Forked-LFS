@@ -1,0 +1,11 @@
+# Configure source
+./configure --prefix=/usr \
+            --docdir=/usr/share/doc/bash-5.1.16 \
+            --without-bash-malloc              \
+            --with-installed-readline
+
+# Compile & build docs
+make
+
+# Install it with docs 
+make install

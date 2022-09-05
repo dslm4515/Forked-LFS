@@ -1,0 +1,11 @@
+# Configure source
+./configure --prefix=/usr
+
+# Compile & build docs
+make
+make html
+
+# Install it with docs 
+make install
+install -d -m755           /usr/share/doc/sed-4.8
+install -m644 doc/sed.html /usr/share/doc/sed-4.8
