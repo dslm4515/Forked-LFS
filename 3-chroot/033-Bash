@@ -4,8 +4,8 @@
             --without-bash-malloc              \
             --with-installed-readline
 
-# Compile & build docs
+# Compile 
 make
 
-# Install it with docs 
+# Install it  
 make install

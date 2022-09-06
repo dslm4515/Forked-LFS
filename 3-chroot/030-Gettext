@@ -2,9 +2,9 @@
 ./configure --prefix=/usr    \
             --disable-static \
             --docdir=/usr/share/doc/gettext-0.21
-# Compile & build docs
+# Compile 
 make
 
-# Install it with docs 
+# Install it  
 make install
 chmod -v 0755 /usr/lib/preloadable_libintl.so
