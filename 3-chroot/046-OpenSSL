@@ -1,0 +1,20 @@
+# Configure source:
+./config --prefix=/usr         \
+         --openssldir=/etc/ssl \
+         --libdir=lib          \
+         shared                \
+         zlib-dynamic
+
+# Compile
+make
+
+# Install it
+sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
+make MANSUFFIX=ssl install
+
+# Add the version to the documentation directory name, to 
+# be consistent with other packages:
+mv -v /usr/share/doc/openssl /usr/share/doc/openssl-3.0.5
+
+# If desired, install some additional documentation:
+cp -vfr doc/* /usr/share/doc/openssl-3.0.5

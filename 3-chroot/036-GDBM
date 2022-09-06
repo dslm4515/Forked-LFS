@@ -1,0 +1,11 @@
+# Configure source
+./configure --prefix=/usr \
+            --disable-static \
+            --enable-libgdbm-compat
+
+# Compile 
+make
+
+# Install it  
+make install
+

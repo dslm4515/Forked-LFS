@@ -1,0 +1,12 @@
+# Fix a warning that is caused by perl-5.22 and later:
+sed -i 's:\\\${:\\\$\\{:' intltool-update.in
+
+# Configure source
+./configure --prefix=/usr
+
+# Compile & build docs
+make
+
+# Install the package and docs
+make install
+install -v -Dm644 doc/I18N-HOWTO /usr/share/doc/intltool-0.51.0/I18N-HOWTO

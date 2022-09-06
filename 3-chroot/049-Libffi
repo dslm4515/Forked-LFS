@@ -1,0 +1,11 @@
+# Configure source
+./configure --prefix=/usr          \
+            --disable-static       \
+            --with-gcc-arch=native \
+            --disable-exec-static-tramp
+
+# Compile
+make
+
+# Install
+make install

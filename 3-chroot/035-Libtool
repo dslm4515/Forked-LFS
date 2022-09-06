@@ -1,0 +1,11 @@
+# Configure source
+./configure --prefix=/usr
+
+# Compile 
+make
+
+# Install it  
+make install
+
+# Remove a useless static library:
+rm -fv /usr/lib/libltdl.a

@@ -1,0 +1,21 @@
+# Configure source
+./configure --prefix=/usr        \
+            --enable-shared      \
+            --with-system-expat  \
+            --with-system-ffi    \
+            --enable-optimizations
+
+# Compile
+make
+
+# Install
+make install
+
+# In several places we use the pip3 command to install Python 3 programs and modules for all users as root. This conflicts with the Python developers recommendation to install packages into a virtual environment or the home directory of a regular user (by running pip3 as this user). To this end, a multi-line warning is written when using pip3 as the root user. The main reason of this recommendation is for avoiding a conflict with the system package manager (dpkg for example), but LFS does not have a system-wide package manager so this is not a problem. And, pip3 will attempt to check for a new version of itself whenever it's run. As domain name resolving is not configured yet in LFS chroot environment, it will fail to check for a new version and produce a warning. Once we boot the LFS system and set up network connection, it will then produce a warning telling the user to update it from a pre-built wheel on PyPI if any new version is available. But LFS consider pip3 a part of Python 3 so it should not be updated separately, and an update from a pre-built wheel will deviate from our purpose to build a Linux system from source code. So the warning for a new pip3 version should be ignored as well. If desired, suppress these warnings by running the following commands:
+cat > /etc/pip.conf << EOF
+[global]
+root-user-action = ignore
+disable-pip-version-check = true
+EOF
+
+

@@ -1,0 +1,20 @@
+# Configure source
+./configure --prefix=/usr \
+            --bindir=/usr/bin    \
+            --localstatedir=/var \
+            --disable-logger     \
+            --disable-whois      \
+            --disable-rcp        \
+            --disable-rexec      \
+            --disable-rlogin     \
+            --disable-rsh        \
+            --disable-servers
+
+# Compile 
+make
+
+# Install it  
+make install
+
+# Move a program to the proper location:
+mv -v /usr/{,s}bin/ifconfig

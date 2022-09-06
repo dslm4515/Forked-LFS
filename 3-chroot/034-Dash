@@ -1,0 +1,11 @@
+# Configure source
+./configure --prefix=/usr        \
+            --sysconfdir=/etc    \
+            --localstatedir=/var \
+            --mandir=/usr/share/man 
+
+# Compile 
+make
+
+# Install it  
+make install

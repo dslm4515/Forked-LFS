@@ -1,0 +1,9 @@
+# Configure source
+./configure --prefix=/usr \
+            --docdir=/usr/share/doc/automake-1.16.5
+
+# Compile & build docs
+make
+
+# Install it  
+make install

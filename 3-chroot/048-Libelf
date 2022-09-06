@@ -1,0 +1,15 @@
+# Libelf is part of elfutils package. Use the elfutils 
+# as the source tarball.
+
+# Configure source
+./configure --prefix=/usr                \
+            --disable-debuginfod         \
+            --enable-libdebuginfod=dummy
+
+# Compile
+make
+
+# Install only the library:
+make -C libelf install
+install -vm644 config/libelf.pc /usr/lib/pkgconfig
+rm /usr/lib/libelf.a
