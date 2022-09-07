@@ -1,0 +1,11 @@
+# Configure source
+./configure --prefix=/usr                           \
+            --docdir=/usr/share/doc/procps-ng-4.0.0 \
+            --disable-static                        \
+            --disable-kill
+
+# Compile 
+make
+
+# Install it  
+make install

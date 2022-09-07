@@ -1,0 +1,26 @@
+# Configure source:
+./configure --prefix=/usr           \
+            --bindir=/usr/sbin      \
+            --sysconfdir=/etc       \
+            --enable-manpages       \
+            --disable-static
+
+# Compile
+make
+
+# Install it
+mkdir -pv /usr/lib/udev/rules.d
+mkdir -pv /etc/udev/rules.d
+make install
+
+# Install some custom rules and support files 
+# useful in an LFS environment:
+tar -xvf ../pkgs/udev-lfs-20171102.tar.xz
+make -f udev-lfs-20171102/Makefile.lfs install
+
+# Adjust support files if not using SysVinit. 
+# The S6+S6-rc bootscripts will set the clock 
+# at boot:
+sed -i -e '6,7s/^/# /' /etc/udev/rules.d/55-lfs.rules
+
+~                 

@@ -1,0 +1,12 @@
+# Configure source
+FORCE_UNSAFE_CONFIGURE=1  \
+./configure --prefix=/usr
+
+# Compile 
+make
+
+# Install it  
+make install
+
+# If desired, install the docs:
+make -C doc install-html docdir=/usr/share/doc/tar-1.34

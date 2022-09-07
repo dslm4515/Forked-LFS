@@ -1,0 +1,16 @@
+# The arpd program included in this package 
+# will not be built since it is dependent 
+# on Berkeley DB, which is not installed in 
+# LFS
+sed -i /ARPD/d Makefile
+rm -fv man/man8/arpd.8
+
+# Compile
+make NETNS_RUN_DIR=/run/netns
+
+# Install
+make SBINDIR=/usr/sbin install
+
+# If desired, install the documentation:
+mkdir -pv             /usr/share/doc/iproute2-5.19.0
+cp -v COPYING README* /usr/share/doc/iproute2-5.19.0

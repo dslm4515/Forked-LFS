@@ -1,0 +1,13 @@
+# For users in the United States, PAGE=letter 
+# is appropriate. Elsewhere, PAGE=A4 may be 
+# more suitable.
+
+# Configure source
+PAGE=<paper_size> ./configure --prefix=/usr
+
+# Compile
+make
+
+# Install it
+make install
+

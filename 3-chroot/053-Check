@@ -1,0 +1,8 @@
+# Configure source
+./configure --prefix=/usr --disable-static
+
+# Compile 
+make
+
+# Install it  
+make install

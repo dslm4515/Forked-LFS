@@ -1,0 +1,48 @@
+# Change the default location of the vimrc 
+# configuration file to /etc:
+echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
+
+# Configure source:
+./configure --prefix=/usr
+
+# Compile
+make 
+
+# Install it
+make install
+
+# Many users are used to using vi instead of 
+# vim. Create a symlink for both the binary 
+# and the man page in the provided languages:
+ln -sv vim /usr/bin/vi
+for L in  /usr/share/man/{,*/}man1/vim.1; do
+    ln -sv vim.1 $(dirname $L)/vi.1
+done
+
+# Create a default vim configuration file by 
+# running the following:
+cat > /etc/vimrc << "EOF"
+" Begin /etc/vimrc
+
+" Ensure defaults are set before customizing settings, not after
+source $VIMRUNTIME/defaults.vim
+let skip_defaults_vim=1
+
+set nocompatible
+set backspace=2
+set mouse=
+syntax on
+if (&term == "xterm") || (&term == "putty")
+  set background=dark
+endif
+
+" End /etc/vimrc
+EOF
+
+# Gvim (GUI for Vim) requires GTK. This is not 
+# built. Vim can be rebuilt later with GTK 
+# installed to build Gvim. Remove the desktop 
+# icons & file:
+rm -v /usr/share/applications/gvim.desktop
+rm -v /usr/share/icons
+
