@@ -1,0 +1,35 @@
+# Recommended to build in a subdirectory of the 
+# source tree:
+mkdir -v build
+cd       build
+
+# Configure source:
+../configure --prefix=/usr           \
+             --sysconfdir=/etc       \
+             --enable-elf-shlibs     \
+             --disable-libblkid      \
+             --disable-libuuid       \
+             --disable-uuidd         \
+             --disable-fsck
+
+# Build
+make
+
+# Install
+make install
+
+# Remove useless static libraries:
+rm -fv /usr/lib/{libcom_err,libe2p,libext2fs,libss}.a
+
+# This package installs a gzipped .info file but 
+# doesn't update the system-wide dir file. Unzip 
+# this file and then update the system dir file 
+# using the following commands:
+gunzip -v /usr/share/info/libext2fs.info.gz
+install-info --dir-file=/usr/share/info/dir /usr/share/info/libext2fs.info 
+
+# If desired, create and install some additional 
+# documentation by issuing the following commands:
+makeinfo -o      doc/com_err.info ../lib/et/com_err.texinfo
+install -v -m644 doc/com_err.info /usr/share/info
+install-info --dir-file=/usr/share/info/dir /usr/share/info/com_err.info
