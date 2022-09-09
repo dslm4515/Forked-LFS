@@ -1,0 +1,24 @@
+# Configure
+./configure --enable-shared      \
+            --enable-static      \
+            --enable-allstatic   \
+            --enable-static-libc \
+            --libdir=/usr/lib \
+            --libexecdir=/usr/lib/s6-linux-init \
+            --with-dynlib=/usr/lib   \
+            --bindir=/usr/bin 
+
+# Compile
+make
+
+# Install
+make install
+
+# Configure scripts to match bootscripts:
+sed -i '39i exec /etc/s6/base/scripts/runlevel "$rl"' \
+       /etc/s6-linux-init/skel/rc.init
+
+sed -i '30s/^.//'  /etc/s6-linux-init/skel/rc.shutdown
+
+sed -i '18s/^.//'  /etc/s6-linux-init/skel/runlevel
+

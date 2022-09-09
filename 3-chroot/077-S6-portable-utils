@@ -1,0 +1,15 @@
+# Configure
+./configure --enable-shared         \
+            --enable-static         \
+            --enable-allstatic      \
+            --enable-static-libc    \
+            --libdir=/usr/lib       \
+            --libexecdir=/usr/lib/s6-portable-utils \
+            --with-dynlib=/usr/lib  \
+            --bindir=/usr/bin
+
+# Compile
+make
+
+# Install
+make install

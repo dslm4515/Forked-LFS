@@ -1,0 +1,14 @@
+# Configure
+./configure --enable-shared         \
+            --enable-static         \
+            --enable-allstatic      \
+            --enable-static-libc    \
+            --libdir=/usr/lib       \
+            --libexecdir=/usr/lib/s6-rc \
+            --with-dynlib=/usr/lib
+
+# Build
+make
+
+# Install
+make install

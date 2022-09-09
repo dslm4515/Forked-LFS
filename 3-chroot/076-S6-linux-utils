@@ -1,0 +1,11 @@
+# Configure
+./configure --disable-allstatic \
+            --prefix=/usr       \
+            --with=dynlib=/usr/lib
+
+# Compile
+make
+
+# Install
+make install
+

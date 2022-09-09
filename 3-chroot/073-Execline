@@ -1,0 +1,14 @@
+# Configure
+./configure --enable-shared       \
+            --enable-static       \
+            --enable-allstatic    \
+            --enable-static-libc  \
+            --libdir=/usr/lib     \
+            --with-dynlib=/usr/lib    \
+            --enable-pedantic-posix 
+
+# Compile
+make
+
+# install
+make install

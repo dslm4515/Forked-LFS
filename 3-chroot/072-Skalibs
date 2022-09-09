@@ -1,0 +1,19 @@
+# Configure source
+./configure --enable-shared   \
+            --enable-static   \
+            --libdir=/usr/lib
+
+# Build
+make
+
+# Install
+make install
+
+# Create the missing pkgconfig file:
+cat >> /usr/lib/pkgconfig/skalibs.pc << "EOF"
+Name: skalibs
+Description: The skarnet.org general-purpose C library.
+URL: https://skarnet.org/software/skalibs/
+Version: 2.12.0.1
+Libs: -lskarnet
+EOF
