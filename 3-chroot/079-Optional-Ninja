@@ -1,0 +1,22 @@
+# Although optional to LFS, Ninja is associated to
+# meson makes a powerful build system combination,
+# whoch is expected to be used more and more often
+# It is required for several packages outside of
+# the LFS build, like in the BLFS book.
+
+# Add the capability to use the environment 
+# variable NINJAJOBS by running:
+sed -i '/int Guess/a \
+  int   j = 0;\
+  char* jobs = getenv( "NINJAJOBS" );\
+  if ( jobs != NULL ) j = atoi( jobs );\
+  if ( j > 0 ) return j;\
+' src/ninja.cc
+
+# Build
+python3 configure.py --bootstrap
+
+# Install
+install -vm755 ninja /usr/bin/
+install -vDm644 misc/bash-completion /usr/share/bash-completion/completions/ninja
+install -vDm644 misc/zsh-completion  /usr/share/zsh/site-functions/_ninja
