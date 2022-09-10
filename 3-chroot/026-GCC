@@ -45,6 +45,10 @@ make install
 chown -v -R root:root \
     /usr/lib/gcc/$(gcc -dumpmachine)/12.2.0/include{,-fixed}
 
+# Many packages use the name cc to call the C compiler. To 
+# satisfy those packages, create a symlink
+ln -sv gcc /usr/bin/cc
+
 # Create a symlink required by the FHS for "historical" 
 # reasons.
 ln -svr /usr/bin/cpp /usr/lib
