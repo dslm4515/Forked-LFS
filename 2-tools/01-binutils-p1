@@ -8,7 +8,7 @@ cd       build
 # Set the build options
 export  CARGS="--prefix=/tools "
 export CARGS+="--with-sysroot=$LFS "
-export CARGS+="--with-lib-path=/tools/lib "
+export CARGS+="--with-lib-path=/tools/lib:/tools/lib64 "
 export CARGS+="--target=$LFS_TGT "
 export CARGS+="--disable-nls "
 export CARGS+="--disable-werror "
