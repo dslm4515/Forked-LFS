@@ -42,31 +42,55 @@ done
 mkdir -v build
 cd       build
 
+# Set the build options
+export  CARGS="--target=$LFS_TGT "
+export CARGS+="--prefix=/tools "
+export CARGS+="--with-glibc-version=2.42 "
+export CARGS+="--with-sysroot=$LFS  "
+export CARGS+="--with-newlib "
+export CARGS+="--without-headers "
+export CARGS+="--enable-default-pie "
+export CARGS+="--enable-default-ssp "
+export CARGS+="--enable-initfini-array  "
+export CARGS+="--disable-nls "
+export CARGS+="--disable-shared "
+export CARGS+="--enable-multilib "
+export CARGS+="--with-multilib-list=m64,m32 "
+export CARGS+="--disable-decimal-float "
+export CARGS+="--disable-threads "
+export CARGS+="--disable-libatomic "
+export CARGS+="--disable-libgomp "
+export CARGS+="--disable-libquadmath "
+export CARGS+="--disable-libssp "
+export CARGS+="--disable-libvtv "
+export CARGS+="--disable-libstdcxx "
+export CARGS+="--enable-languages=c,c++ " 
+export CARGS+="--with-local-prefix=/tools "
+export CARGS+="--with-native-system-header-dir=/tools/include "
+
 # Configure the source
-../configure                                       \
-    --target=$LFS_TGT                              \
-    --prefix=/tools                                \
-    --with-glibc-version=2.35                      \
-    --with-sysroot=$LFS                            \
-    --with-newlib                                  \
-    --without-headers                              \
-    --with-local-prefix=/tools                     \
-    --with-native-system-header-dir=/tools/include \
-    --disable-nls                                  \
-    --disable-shared                               \
-    --disable-multilib                             \
-    --disable-decimal-float                        \
-    --disable-threads                              \
-    --disable-libatomic                            \
-    --disable-libgomp                              \
-    --disable-libquadmath                          \
-    --disable-libssp                               \
-    --disable-libvtv                               \
-    --disable-libstdcxx                            \
-    --enable-languages=c,c++
+../configure $CARGS
 
 # Compile
 make
 
 # Install to /tools
 make intall
+
+# This build of GCC has installed a couple of internal system 
+# headers. Normally one of them, limits.h, would in turn 
+# include the corresponding system limits.h header, in this case, 
+# $LFS/usr/include/limits.h. However, at the time of this build 
+# of GCC $LFS/usr/include/limits.h does not exist, so the internal 
+# header that has just been installed is a partial, self-contained 
+# file and does not include the extended features of the system 
+# header. This is adequate for building Glibc, but the full internal 
+# header will be needed later. Create a full version of the internal 
+# header using a command that is identical to what the GCC build 
+# system does in normal circumstances: 
+cd ..
+cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+  `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include/limits.h
+
+# Clean up
+unset CARGS
