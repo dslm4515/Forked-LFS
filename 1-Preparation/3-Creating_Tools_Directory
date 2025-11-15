@@ -25,3 +25,5 @@ ln -sv $LFS/tools /
 # are still using some tools from the host) and in the next 
 # (when we are “chrooted” to the LFS partition).
 
+# Create additional directories for this multi-lib build
+mkdir -pv $LFS/tools/lib{,64,32}
