@@ -1,21 +1,48 @@
+# Tools: Glibc
+# Build as lfs user
+
+# Create a symbolic link for LSB compliance. Additionally, 
+# for x86_64, create a compatibility symbolic link required 
+# for proper operation of the dynamic library loader: 
+mkdir -pv /tools/lib64
+ln -sfv ../lib/ld-linux-x86-64.so.2 /tools/lib64
+ln -sfv ../lib/ld-linux-x86-64.so.2 /tools/lib64/ld-lsb-x86-64.so.3
+
+# Some of the Glibc programs use the non-FHS-compliant 
+# /var/db directory to store their runtime data. Apply the 
+# following patch to make such programs store their runtime 
+# data in the FHS-compliant locations: 
+patch -Np1 -i ../patches/glibc-2.42-fhs-1.patch 
+
+# The Glibc documentation recommends building Glibc in a 
+# dedicated build directory: 
 mkdir -v build
 cd       build
 
-../configure                             \
-      --prefix=/tools                    \
-      --host=$LFS_TGT                    \
-      --build=$(../scripts/config.guess) \
-      --enable-kernel=3.2                \
-      --with-headers=/tools/include
+# Set the build options
+export  CARGS="--prefix=/tools "
+export CARGS+="--host=$LFS_TGT "
+export CARGS+="--build=$(../scripts/config.guess) "
+export CARGS+="--enable-kernel=5.4 "
+export CARGS+="--with-headers=/tools/include "
+export CARGS+="--disable-nscd "
+export CARGS+="libc_cv_slibdir=/tools/lib "
 
+# Configure the source
+../configure $CARGS
+
+# Compile
 make 
 
+# Install
 make install
 
-# At this point, it is imperative to stop and ensure that the basic functions (compiling and linking) of the new toolchain are working as expected. To perform a sanity check, run the following commands:
+# Fix a hard coded path to the executable loader in the 
+# ldd script: 
+sed '/RTLDLIST=/s@/usr@@g' -i /tools/bin/ldd
 
-echo 'int main(){}' > dummy.c
-$LFS_TGT-gcc dummy.c
+# At this point, it is imperative to stop and ensure that the basic functions (compiling and linking) of the new toolchain are working as expected. To perform a sanity check, run the following commands:
+echo 'int main(){}' | $LFS_TGT-gcc -x c - -v -Wl,--verbose &> dummy.log
 readelf -l a.out | grep ': /tools'
 
 # If everything is working correctly, there should be no errors, and the output of the last command will be of the form:
