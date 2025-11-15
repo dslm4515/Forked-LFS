@@ -41,12 +41,61 @@ make install
 # ldd script: 
 sed '/RTLDLIST=/s@/usr@@g' -i /tools/bin/ldd
 
-# At this point, it is imperative to stop and ensure that the basic functions (compiling and linking) of the new toolchain are working as expected. To perform a sanity check, run the following commands:
+# At this point, it is imperative to stop and ensure that the basic 
+# functions (compiling and linking) of the new toolchain are working 
+# as expected. To perform a sanity check, run the following commands:
 echo 'int main(){}' | $LFS_TGT-gcc -x c - -v -Wl,--verbose &> dummy.log
 readelf -l a.out | grep ': /tools'
 
-# If everything is working correctly, there should be no errors, and the output of the last command will be of the form:
+# If everything is working correctly, there should be no errors, and 
+# the output of the last command will be of the form:
 # [Requesting program interpreter: /tools/lib64/ld-linux-x86-64.so.2]
+
+# Make sure that we're set up to use the correct start files: 
+grep -E -o "/tools/lib.*/S?crt[1in].*succeeded" dummy.log
+
+# The output of the last command should be:
+# /tools/lib/../lib/Scrt1.o succeeded
+# /tools/lib/../lib/crti.o succeeded
+# /tools/lib/../lib/crtn.o succeeded
+
+# Verify that the compiler is searching for the correct header files:
+grep -A3 "search starts here"  dummy.log
+
+# This command should return the following output: 
+# #include "..." search starts here:
+# #include <...> search starts here:
+#   /mnt/lfs/tools/bin/../lib/gcc/x86_64-lfs-linux-gnu/15.2.0/include
+#   /mnt/lfs/tools/bin/../lib/gcc/x86_64-lfs-linux-gnu/15.2.0/include-fixed
+#   /mnt/lfs/tools/include
+
+# Again, the directory path will be different than 
+# the above, depending on how $LFS was mounted
+
+# Next, verify that the new linker is being used with the correct search paths:
+grep "SEARCH_DIR" dummy.log |sed 's|; |\n|g'
+
+# References to paths that have components with '-linux-gnu' should be ignored, 
+# but otherwise the output of the last command should be: 
+# SEARCH_DIR("=/tools/x86_64-lfs-linux-gnu/lib64")
+# SEARCH_DIR("/tools/lib")
+# SEARCH_DIR("=/tools/x86_64-lfs-linux-gnu/lib");
+# A 32-bit system may use a few other directories, but anyway the important 
+# facet here is all the paths should begin with an equal sign (=), which 
+# would be replaced with the sysroot directory that we've configured for the linker. 
+
+# Next make sure that we're using the correct libc: 
+grep "/lib.*/libc.so.6 " dummy.log
+
+# The output of the last command should be:
+# attempt to open /mnt/lfs/tools/lib/libc.so.6 succeeded
+
+#  Make sure GCC is using the correct dynamic linker: 
+grep found dummy.log
+
+# The output of the last command should be (allowing for platform-specific 
+# differences in dynamic linker name): 
+# found ld-linux-x86-64.so.2 at /mnt/lfs/tools/lib/ld-linux-x86-64.so.2
 
 # Once all is well, clean up the test files:
 rm -v dummy.c a.out
