@@ -36,7 +36,7 @@ do
 done
 
 # For Musl hosts:
-patch -Np1 -i ../patches/gcc-gentoo/poisoned_callac_musl_systems.patch 
+#patch -Np1 -i ../patches/gcc-gentoo/poisoned_callac_musl_systems.patch 
 
 # The GCC documentation recommends building GCC in a dedicated build directory
 mkdir -v build
