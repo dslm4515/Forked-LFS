@@ -1,6 +1,16 @@
+# Tools: Linux Kernel Headers
+# Build as lfs user
+
+# Make sure there are no stale files embedded in the package: 
 make mrproper
 
+# Extract the headers
 make headers
+find usr/include -type f ! -name '*.h' -delete
+
+# The recommended make target “headers_install” cannot be used, 
+# because it requires rsync, which may not be available. The 
+# headers are first placed in ./usr, then copied to the needed location. 
 cp -rv usr/include/* /tools/include
 
 
