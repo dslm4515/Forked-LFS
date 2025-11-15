@@ -10,6 +10,15 @@ mv -v mpfr-4.1.0 mpfr
 mv -v gmp-6.2.1 gmp
 mv -v mpc-1.2.1 mpc
 
+# Change the default directory name for libraries:
+sed -e '/m64=/s/lib64/lib/' \
+    -e '/m32=/s/m32=.*/m32=..\/lib32$(call if_multiarch,:i386-linux-gnu)/' \
+    -i.orig gcc/config/i386/t-linux64
+
+# Make -mstackrealign a default for 32bit objects: 
+sed '/STACK_REALIGN_DEFAULT/s/0/(!TARGET_64BIT \&\& TARGET_SSE)/' \
+      -i gcc/config/i386/i386.h
+
 # Change the location of GCC's default dynamic linker to use the 
 # one installed in /tools. It also removes /usr/include from GCC's 
 # include search path. Issue:
