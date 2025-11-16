@@ -103,3 +103,55 @@ grep found dummy.log
 
 # Once all is well, clean up the test files:
 rm -v dummy.c a.out
+
+## 32-bit Glibc
+
+# The extracted source can not be reused as the build will fail. 
+# Remove source and extract it again.
+
+# The Glibc documentation recommends building Glibc in a 
+# dedicated build directory: 
+mkdir -v build
+cd       build
+
+# Set the build options
+export  CARGS="--prefix=/tools "
+export CARGS+="--host=$LFS_TGT32 "
+export CARGS+="--build=$(../scripts/config.guess) "
+export CARGS+="--enable-kernel=5.4 "
+export CARGS+="--with-headers=/tools/include "
+export CARGS+="--disable-nscd "
+export CARGS+="--libdir=/tools/lib32 "
+export CARGS+="--libexecdir=/tools/lib32 "
+export CARGS+="libc_cv_slibdir=/tools/lib32 "
+
+# Configure the build
+CC="$LFS_TGT-gcc -m32"  \
+CXX="$LFS_TGT-g++ -m32" \
+../configure $CARGS
+
+# Compile
+make
+
+# Install to a temporary directory and install
+# only what we need:
+make DESTDIR=$PWD/DESTDIR install
+cp -a DESTDIR/tools/lib32/*   /tools/lib32/
+install -vm644 DESTDIR/tools/include/gnu/{lib-names,stubs}-32.h \
+               /tools/include/gnu/
+ln -svf ../lib32/ld-linux.so.2 /tools/lib/ld-linux.so.2
+
+# At this point, it is imperative to stop and ensure that the basic 
+# functions (compiling and linking) of the new toolchain are working 
+# as expected. To perform a sanity check, run the following commands: 
+echo 'int main(){}' > dummy.c
+$LFS_TGT-gcc -m32 dummy.c
+readelf -l a.out | grep '/ld-linux'
+
+# If everything is working correctly, there should be no errors, and 
+# the output of the last command will be of the form: 
+# [Requesting program interpreter: /tools/lib/ld-linux.so.2]
+
+# Once all is well, clean up
+rm -v dummy.c a.out
+unset CARGS
