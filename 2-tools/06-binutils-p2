@@ -1,21 +1,50 @@
+# Tools: Binutils Pass 2
+# Build as lfs
+
+# Binutils building system relies on an shipped libtool copy to link 
+# against internal static libraries, but the libiberty and zlib copies
+# shipped in the package do not use libtool. This inconsistency may 
+# cause produced binaries mistakenly linked against libraries from 
+# the host distro. Work around this issue: 
+sed '6031s/$add_dir//' -i ltmain.sh
+
+# Create a separate build directory again:
 mkdir -v build
 cd       build
 
+# Set build options
+export  CARGS="--prefix=/tools "
+export CARGS+="--disable-nls "
+export CARGS+="--disable-werror "
+export CARGS+="--with-lib-path=/tools/lib "
+export CARGS+="--with-sysroot "
+export CARGS+="--enable-64-bit-bfd "
+export CARGS+="--enable-shared "
+export CARGS+="--enable-gprofng=no " 
+export CARGS+="--enable-new-dtags "
+export CARGS+="--enable-default-hash-style=gnu "
+
+# Configure source
 CC=$LFS_TGT-gcc                \
 AR=$LFS_TGT-ar                 \
 RANLIB=$LFS_TGT-ranlib         \
-../configure                   \
-    --prefix=/tools            \
-    --disable-nls              \
-    --disable-werror           \
-    --with-lib-path=/tools/lib \
-    --with-sysroot
+../configure $CARGS
 
+# Compile
 make 
 
+# Install to /tools
 make install
 
+# Now prepare the linker for the “Re-adjusting” 
+# phase later on:
 make -C ld clean
-make -C ld LIB_PATH=/usr/lib:/lib
+make -C ld LIB_PATH=/usr/lib:/lib:/usr/lib32:/lib32:/usr/lib64:/lib64
 cp -v ld/ld-new /tools/bin
 
+# Remove the libtool archive files because they are harmful 
+# for cross compilation
+rm -v /tools/lib/lib{bfd,ctf,ctf-nobfd,opcodes,sframe}.la
+
+# Clean up
+unset CARGS
