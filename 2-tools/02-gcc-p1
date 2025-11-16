@@ -75,7 +75,7 @@ export CARGS+="--with-native-system-header-dir=/tools/include "
 make
 
 # Install to /tools
-make intall
+make install
 
 # This build of GCC has installed a couple of internal system 
 # headers. Normally one of them, limits.h, would in turn 
