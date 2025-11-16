@@ -19,6 +19,9 @@ patch -Np1 -i ../patches/glibc-2.42-fhs-1.patch
 mkdir -v build
 cd       build
 
+# Ensure that the ldconfig and sln utilities are installed into /tools/bin:
+echo "rootsbindir=/tools/bin" > configparms 
+
 # Set the build options
 export  CARGS="--prefix=/tools "
 export CARGS+="--host=$LFS_TGT "
@@ -79,6 +82,7 @@ grep "SEARCH_DIR" dummy.log |sed 's|; |\n|g'
 # but otherwise the output of the last command should be: 
 # SEARCH_DIR("=/tools/x86_64-lfs-linux-gnu/lib64")
 # SEARCH_DIR("/tools/lib")
+# SEARCH_DIR("/tools/lib64")
 # SEARCH_DIR("=/tools/x86_64-lfs-linux-gnu/lib");
 # A 32-bit system may use a few other directories, but anyway the important 
 # facet here is all the paths should begin with an equal sign (=), which 
