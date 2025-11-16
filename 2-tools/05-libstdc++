@@ -1,15 +1,32 @@
+# Tools: Libstdc++ from GCC
+# Build as lfs
+
+# NOTE: Libstdc++ is part of the GCC sources. You should 
+# first unpack the GCC tarball and change to the gcc-15.2.0 
+# directory. 
+
+# Create a separate build directory for Libstdc++ and enter it: 
 mkdir -v build
 cd       build
 
-../libstdc++-v3/configure           \
-    --host=$LFS_TGT                 \
-    --prefix=/tools                 \
-    --disable-multilib              \
-    --disable-nls                   \
-    --disable-libstdcxx-threads     \
-    --disable-libstdcxx-pch         \
-    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/12.1.0
+# Set the build options
+export  CARGS="--host=$LFS_TGT "
+export CARGS+="--build=$(../config.guess) "
+export CARGS+="--prefix=/tools "
+export CARGS+="--enable-multilib "
+export CARGS+="--disable-nls "
+export CARGS+="--disable-libstdcxx-pch "
+export CARGS+="--with-gxx-include-dir=/tools/$LFS_TGT/include/c++/15.2.0 "
 
+# Configure the source
+../libstdc++-v3/configure $CARGS 
+
+# Compile
 make 
 
+# Install to /tools
 make install
+
+# Remove the libtool archive files because they are harmful for 
+# cross-compilation:
+rm -v /tools/lib/lib{stdc++{,exp,fs},supc++}.la
